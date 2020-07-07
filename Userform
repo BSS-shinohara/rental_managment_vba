@@ -1,0 +1,856 @@
+VERSION 5.00
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UserForm1 
+   Caption         =   "UserForm1"
+   ClientHeight    =   9915
+   ClientLeft      =   120
+   ClientTop       =   465
+   ClientWidth     =   15255
+   OleObjectBlob   =   "UserForm1.frx":0000
+   StartUpPosition =   1  'オーナー フォームの中央
+End
+Attribute VB_Name = "UserForm1"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+
+
+Private Sub UserForm_Initialize()
+'起動時に実行するプロシージャ
+
+UserForm1.Caption = "貸出管理簿ふぉ～む"
+    'オプショングループの設定
+    Dim button_list As Long
+    For button_list = 1 To 6
+       Me.Controls("OptionButton" & button_list).GroupName = "status"
+    Next button_list
+    
+    With ComboBox5
+                Dim cnt4 As Long
+                Dim IndexList As Variant
+                
+                .Clear
+                
+                '頭文字配列を追加する場合、index_list変数に追加してください。
+                index_list = Array("鍵", "パーキングカード", "昭和シェルガソリンカード", "レンタカーカード", "トヨタレンタカー/ETC", "ガソリンカード", "ETCカード", "書籍", "カメラ", "ノートPC", "携帯(SB)", "携帯充電器", "メモリーカード", "カメラ充電器")
+                For cnt4 = 0 To UBound(index_list)
+                    .AddItem index_list(cnt4)
+                Next cnt4
+            End With
+    
+    With ComboBox6
+            
+                
+                .Clear
+                
+                '頭文字配列を追加する場合、index_list変数に追加してください。
+                index_list = Array("鍵", "パーキングカード", "昭和シェルガソリンカード", "レンタカーカード", "トヨタレンタカー/ETC", "ガソリンカード", "ETCカード", "書籍", "カメラ", "ノートPC", "携帯(SB)", "携帯充電器", "メモリーカード", "カメラ充電器")
+                For cnt4 = 0 To UBound(index_list)
+                    .AddItem index_list(cnt4)
+                Next cnt4
+            End With
+    
+    '頭文字のインデックス
+    With ComboBox4
+        
+        Dim cnt As Long
+        Dim hiragana As Variant
+        '頭文字配列を追加する場合、hiragana変数に追加してください。
+        hiragana = Array("責任者", "あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "ん")
+        For cnt = 0 To UBound(hiragana)
+            .AddItem hiragana(cnt)
+        Next cnt
+    End With
+   
+    With ListBox3
+        .ColumnCount = 4
+    End With
+
+End Sub
+
+Private Sub CheckBox1_Click()
+    Debug.Print ListBox2.Value
+        ListBox2_Click
+End Sub
+
+Private Sub ComboBox5_Change()
+   Dim serach_word As String
+        Dim target_sheet As Variant
+        Dim result As Variant
+        Dim rows As Long
+        Dim id As Long
+
+    
+        serach_word = ComboBox5.Text
+        Sheets("Data").Activate
+        target_sheet = Worksheets("Data").Range("A1:A10000")
+        row = 0
+        
+    With ListBox5
+    .Clear
+    .ColumnCount = 4
+         For cnt = 1 To 10000
+            If serach_word = target_sheet(cnt, 1) Then
+                If Worksheets("Data").Cells(cnt, 27) = "マスター" Then Else
+                    If Worksheets("Data").Cells(cnt, 12) = "金庫保管" Or Worksheets("Data").Cells(cnt, 12) = "貸出可能" Then
+                        .AddItem cnt
+                        .List(row, 1) = Worksheets("Data").Cells(cnt, 1)
+                        .List(row, 2) = Worksheets("Data").Cells(cnt, 3)
+                        .List(row, 3) = Worksheets("Data").Cells(cnt, 6)
+                        .List(row, 4) = Worksheets("Data").Cells(cnt, 12)
+                        row = row + 1
+                        
+                    End If
+                
+            End If
+          
+        Next cnt
+    End With
+    
+End Sub
+
+Private Sub CommandButton2_Click()
+'ラジオボタンの選択を取り消す
+    Dim i As Long
+    For i = 1 To 6
+        Me.Controls("OptionButton" & i).Value = False
+    Next i
+End Sub
+
+
+Private Sub ListBox5_Click()
+'検索結果をフォームに入力
+'貸出リスト
+    
+    Dim select_object As Variant
+    Dim row As Long
+    Dim i As Long
+    Dim chk As Boolean
+    
+    row = ListBox5
+    '行番号から配列で取得する
+    Sheets("Data").Activate
+    select_object = Worksheets("Data").Range(Cells(row, 1), Cells(row, 30))
+    
+    
+    'フォームに転記する
+    
+    '備品名
+    With ComboBox6
+        .Value = select_object(1, 1)
+    End With
+    
+    'Id等
+    With TextBox6
+        .Value = select_object(1, 3)
+    End With
+    
+    '備考
+    With TextBox7
+        .Value = select_object(1, 13)
+    End With
+    
+    '開始日
+    With TextBox8
+        .Value = select_object(1, 6)
+    End With
+    
+    '開始日借用者
+    With TextBox9
+        .Value = select_object(1, 7)
+    End With
+    
+    '開始日確認
+    With TextBox10
+        .Value = select_object(1, 8)
+    End With
+    
+    '返却日
+    With TextBox11
+        .Value = select_object(1, 9)
+    End With
+    
+    '返却日借用者
+    With TextBox12
+        .Value = select_object(1, 10)
+    End With
+    
+    '返却日確認
+    With TextBox13
+        .Value = select_object(1, 11)
+    End With
+    
+    'メーカ名
+    With TextBox14
+        .Value = select_object(1, 14)
+    End With
+    
+    '型番
+    With TextBox15
+        .Value = select_object(1, 15)
+    End With
+    
+    '担当者
+    With TextBox29
+        .Value = select_object(1, 4)
+    End With
+    
+    '現在のステータス
+    With Label8
+        .Caption = select_object(1, 12)
+        
+        If .Caption = "貸出中" Then
+            'OptionButton2.Enabled = False
+        End If
+    End With
+    
+    
+End Sub
+
+Private Sub MultiPage1_Change()
+    With MultiPage1
+    
+        Dim i As Long
+        Dim target_sheet As Variant
+        Dim row As Long
+        select_object_clear
+        Dim end_cnt As Long
+        'ページタブが押されたときのイベント
+        If .Value = 0 Then
+
+        End If
+        If .Value = 1 Then
+            OptionButton2.Value = True
+        End If
+        
+        If .Value = 2 Then
+            OptionButton2.Value = True
+            With ComboBox5
+                Dim cnt4 As Long
+                Dim IndexList As Variant
+                
+                .Clear
+                
+                '頭文字配列を追加する場合、index_list変数に追加してください。
+                index_list = Array("鍵", "パーキングカード", "昭和シェルガソリンカード", "レンタカーカード", "トヨタレンタカー/ETC", "ガソリンカード", "ETCカード", "書籍", "カメラ", "ノートPC", "携帯(SB)", "携帯充電器", "メモリーカード", "カメラ充電器")
+                For cnt4 = 0 To UBound(index_list)
+                    .AddItem index_list(cnt4)
+                Next cnt4
+            End With
+        End If
+
+        If .Value = 3 Then
+            Sheets("Data").Activate
+            target_sheet = Worksheets("Data").Range("L1:L10000")
+            row = 0
+        
+            With ListBox4
+                .Clear
+                .ColumnCount = 4
+                For cnt = 1 To 10000
+                    If target_sheet(cnt, 1) = "廃棄予定" Then
+                        .AddItem cnt
+                        .List(row, 1) = Worksheets("Data").Cells(cnt, 1)
+                        .List(row, 2) = Worksheets("Data").Cells(cnt, 3)
+                        .List(row, 3) = Worksheets("Data").Cells(cnt, 6)
+                        row = row + 1
+                    End If
+                Next cnt
+            End With
+            
+        End If
+        
+        
+    End With
+    
+End Sub
+
+
+Private Sub TextBox1_Change()
+    Dim serach_word As Integer
+    search_word = TextBox1.Text
+    'Worksheets("スタッフリスト").Range("A1").Value = TextBox1.Text
+End Sub
+
+Private Sub ComboBox4_Change()
+'頭文字からユーザを表示する
+
+ListBox2.Clear
+ListBox3.Clear
+With ListBox2
+    Dim search_key As String
+    Dim i As Long
+    Dim staff_list As Variant
+    Dim cnt As Long
+
+
+    'MaxRow = Rows.Count
+    
+    search_key = ComboBox4.Text
+    cnt = 300
+    Sheets("staff").Activate
+    staff_list = Worksheets("staff").Range(Cells(1, 1), Cells(cnt, 2))
+    Sheets("Data").Activate
+    
+    
+        For i = 1 To cnt
+            If search_key = staff_list(i, 1) Then
+                .AddItem staff_list(i, 2)
+            End If
+        Next i
+    End With
+    '入力済みのフォームを削除する
+    select_object_clear
+End Sub
+Private Sub ListBox2_Click()
+    'staffを選択したと時に行うアクション
+        Dim serach_name As String
+        Dim target_sheet As Variant
+        Dim result As Variant
+        Dim row As Long
+        Dim id As Long
+        Dim max_row As Long
+        serach_name = ListBox2.Text
+        'Sheets("Data").Activate Cells(1, 1), Cells(10000, 30)
+        target_sheet = Worksheets("Data").Range("B1:B10000")
+        row = 0
+        
+    With ListBox3
+    .Clear
+    .ColumnCount = 5
+         For cnt = 1 To 10000
+            If serach_name = target_sheet(cnt, 1) Then
+                If CheckBox1.Value = False Then
+                    If Worksheets("Data").Cells(cnt, 12) = "貸出中" Then
+                        .AddItem cnt
+                        .List(row, 1) = Worksheets("Data").Cells(cnt, 1)
+                        .List(row, 2) = Worksheets("Data").Cells(cnt, 3)
+                        .List(row, 3) = Worksheets("Data").Cells(cnt, 6)
+                        .List(row, 4) = Worksheets("Data").Cells(cnt, 12)
+                        row = row + 1
+                    End If
+                    
+                    Else
+                    .AddItem cnt
+                    .List(row, 1) = Worksheets("Data").Cells(cnt, 1)
+                    .List(row, 2) = Worksheets("Data").Cells(cnt, 3)
+                    .List(row, 3) = Worksheets("Data").Cells(cnt, 6)
+                    .List(row, 4) = Worksheets("Data").Cells(cnt, 12)
+                    row = row + 1
+                End If
+            End If
+        Next cnt
+    End With
+    '入力済みのフォームを削除する
+    select_object_clear
+End Sub
+
+Private Sub ListBox3_Click()
+    '貸出リスト
+    
+    Dim select_object As Variant
+    Dim row As Long
+    Dim i As Long
+    Dim chk As Boolean
+    
+    row = ListBox3
+    '行番号から配列で取得する
+    Sheets("Data").Activate
+    select_object = Worksheets("Data").Range(Cells(row, 1), Cells(row, 30))
+    
+    
+    'フォームに転記する
+    
+    '備品名
+    With ComboBox6
+        .Value = select_object(1, 1)
+    End With
+    
+    'Id等
+    With TextBox6
+        .Value = select_object(1, 3)
+    End With
+    
+    '備考
+    With TextBox7
+        .Value = select_object(1, 13)
+    End With
+    
+    '開始日
+    With TextBox8
+        .Value = select_object(1, 6)
+    End With
+    
+    '開始日借用者
+    With TextBox9
+        .Value = select_object(1, 7)
+    End With
+    
+    '開始日確認
+    With TextBox10
+        .Value = select_object(1, 8)
+    End With
+    
+    '返却日
+    With TextBox11
+        .Value = select_object(1, 9)
+    End With
+    
+    '返却日借用者
+    With TextBox12
+        .Value = select_object(1, 10)
+    End With
+    
+    '返却日確認
+    With TextBox13
+        .Value = select_object(1, 11)
+    End With
+    
+    'メーカ名
+    With TextBox14
+        .Value = select_object(1, 14)
+    End With
+    
+    '型番
+    With TextBox15
+        .Value = select_object(1, 15)
+    End With
+    
+    '入力者
+    With TextBox29
+        .Value = select_object(1, 4)
+    End With
+    
+    
+    '現在のステータス
+    With Label8
+        .Caption = select_object(1, 12)
+        If .Caption = "貸出中" Then
+            'OptionButton2.Enabled = False
+        End If
+    End With
+    
+    
+    
+End Sub
+Private Function RadioResult() As String
+    'ラジオボタンのキャプションを取得するプロシージャ
+    Dim i As Integer
+    For i = 1 To 6
+        If Me.Controls("OptionButton" & i).Value = True Then
+            RadioResult = Me.Controls("OptionButton" & i).Caption
+        End If
+    Next i
+    
+    '変更がない場合0を返す
+    If RadioResult = "" Then
+        RadioResult = 0
+    End If
+End Function
+Private Function RadioNum() As Long
+'ラジオボタンのグループでvalueがtrueになっている番号を取得するプロシージャ
+
+    Dim i As Long
+    For i = 1 To 6
+        If Me.Controls("OptionButton" & i).Value = True Then
+            RadioNum = i
+            Exit For
+        End If
+    Next i
+End Function
+Private Sub select_object_clear()
+'フォームに入力されている情報をリセットするプロシージャ
+    Dim i As Long
+    For i = 6 To 15
+     Me.Controls("TextBox" & i).Value = ""
+    Next i
+    
+    For i = 1 To 6
+    Me.Controls("OptionButton" & i).Value = False
+    Next i
+    
+    '個別で
+    Label8.Caption = ""
+    TextBox29.Value = ""
+End Sub
+Private Function chk_result(i)
+'ネットワーク権限のチェックを文字列に変換するプロシージャ
+    If Me.Controls("CheckBox" & i).Value = True Then
+        chk_result = "○"
+    Else
+        chk_result = "-"
+    End If
+End Function
+
+Private Function insert_data(row)
+'フォームに入力された情報をDataシートに転記するプロシージャ
+
+ With Worksheets("Data")
+                .Cells(row, 1).Value = ComboBox6.Value '備品名
+                .Cells(row, 2).Value = ListBox2.Text 'スタッフ名
+                .Cells(row, 3).Value = TextBox6.Value 'ＩＤ等
+                .Cells(row, 4).Value = TextBox29.Value '担任者
+                .Cells(row, 6).Value = TextBox8.Value '借用時　開始日
+                .Cells(row, 7).Value = TextBox9.Value '借用時　借用者
+                .Cells(row, 8).Value = TextBox10.Value '借用時　確認
+                .Cells(row, 9).Value = TextBox11.Value '返却時　返却日
+                .Cells(row, 10).Value = TextBox12.Value '返却時　借用者
+                .Cells(row, 11).Value = TextBox13.Value '返却時　確認
+                .Cells(row, 12).Value = RadioResult '状況（ラジオボタン）
+                .Cells(row, 13).Value = TextBox7.Value '備考
+                .Cells(row, 14).Value = TextBox14.Value 'メーカ名
+                .Cells(row, 15).Value = TextBox15.Value '製品名
+                insert_data = "登録変更しました。"
+                'マルチページが新規貸出の場合は以下の内容も登録する。
+                If MultiPage1.Value = 1 Then
+                .Cells(row, 2).Value = ListBox2.Text 'スタッフ名
+                .Cells(row, 4).Value = TextBox29 '担当者
+                .Cells(row, 5).Value = Date '入力日
+                .Cells(row, 16).Value = TextBox21.Value 'OS
+                .Cells(row, 17).Value = TextBox22.Value '設置場所
+                .Cells(row, 18).Value = TextBox23.Value 'アカウント名
+                .Cells(row, 19).Value = chk_result(2) 'チェックリスト変換 staff
+                .Cells(row, 20).Value = chk_result(3) 'チェックリスト変換 public
+                .Cells(row, 21).Value = chk_result(4) 'チェックリスト変換 leader
+                .Cells(row, 22).Value = TextBox17.Value 'tel
+                .Cells(row, 23).Value = TextBox16.Value 'mail
+                .Cells(row, 24).Value = TextBox18.Value 'pass
+                insert_data = "新規登録しました。"
+                ElseIf MultiPage1.Value = 2 Then
+                .Cells(row, 17).Value = TextBox34.Value '設置場所
+                .Cells(row, 18).Value = TextBox35.Value 'アカウント名
+                .Cells(row, 19).Value = chk_result(5) 'チェックリスト変換 staff
+                .Cells(row, 20).Value = chk_result(6) 'チェックリスト変換 public
+                .Cells(row, 21).Value = chk_result(7) 'チェックリスト変換 leader
+                .Cells(row, 22).Value = TextBox31.Value 'tel
+                .Cells(row, 23).Value = TextBox32.Value 'mail
+                .Cells(row, 24).Value = TextBox33.Value 'pass
+                insert_data = "登録変更しました。"
+                End If
+            
+                
+            End With
+
+End Function
+
+Private Function CopyAndPasteItem(row, trans_row)
+
+'引数はコピー元セルの列、コピー先セル列
+'コピー先セルは0の場合、最終列にコピーします。
+'コピー先のセルを戻り値としています。
+    With Worksheets("Data")
+        If trans_row = 0 Then
+            trans_row = .Cells(rows.Count, 2).End(xlUp).row + 1 '最終行を取得
+        End If
+
+    
+        .Range(Cells(row, 1), Cells(row, 30)).Copy .Range(Cells(trans_row, 1), Cells(trans_row, 30))
+        
+
+        CopyAndPasteItem = trans_row
+    End With
+End Function
+
+
+
+Private Sub CommandButton1_Click()
+'更新ボタン
+    Dim target_sheet As Variant
+    Dim row As Long
+    Dim ans As Long
+    Dim copy_row As Long
+    Dim msg As String
+    Dim elart_msg As String
+    Dim chk_msg As String
+    Dim chk_code As Variant
+    
+    elart_msg = "更新しますか？"
+    chk_code = check_form(1) 'ステータスコード： 0:ok, 1:NG, 2:yes/no　4:pdf
+    If chk_code = 1 Then
+        MsgBox (check_form(0))
+        Exit Sub
+    ElseIf chk_code = 2 Then
+        elart_msg = check_form(0)
+    End If
+
+    
+    
+    
+    
+    ans = MsgBox(elart_msg, vbYesNo)
+    If ans = 6 Then
+        
+        '貸出中タブの操作
+        If MultiPage1.Value = 1 Then
+            row = Worksheets("Data").Cells(rows.Count, 1).End(xlUp).row + 1
+        ElseIf MultiPage1.Value = 2 Then
+            row = ListBox5.Value
+        Else
+            row = ListBox3.Value
+        End If
+        
+        msg = insert_data(row)
+
+        '変更後ステータスに応じてアクションを行う。
+        With Worksheets("Data")
+            If RadioNum = 1 Then '貸出可能が選択された場合。
+                copy_row = CopyAndPasteItem(row, 0)
+                .Range(Cells(copy_row, 6), Cells(copy_row, 11)).ClearContents
+                .Range(Cells(copy_row, 17), Cells(copy_row, 26)).ClearContents
+                'コピー元と先のステータス更新
+                .Cells(row, 12).Value = "返却済み"
+                .Cells(copy_row, 2).Value = "管理責任者"
+                .Cells(copy_row, 12).Value = "貸出可能"
+            ElseIf RadioNum = 4 Then '金庫保管が選択された場合。
+                copy_row = CopyAndPasteItem(row, 0)
+                .Range(Cells(copy_row, 6), Cells(copy_row, 11)).ClearContents
+                .Range(Cells(copy_row, 17), Cells(copy_row, 26)).ClearContents
+                'コピー元と先のステータス更新
+                .Cells(row, 12).Value = "返却済み"
+                .Cells(copy_row, 2).Value = "管理責任者"
+                .Cells(copy_row, 12).Value = "金庫保管"
+            End If
+        End With
+        
+        ListBox2_Click
+        ComboBox5_Change
+        select_object_clear
+        MsgBox (msg)
+    Else
+        MsgBox ("中断しました。")
+    End If
+    
+    ans = MsgBox("pdfテンプレートを作成しますか？", vbYesNo)
+    If ans = 6 Then
+    create_template (row)
+    End If
+    
+    ans = MsgBox("pdf発行までやりますか？", vbYesNo)
+    If ans = 6 Then
+    export_pdf
+    End If
+    
+     
+End Sub
+Private Sub ToggleButton1_Click()
+'廃棄処理ボタン
+    Dim target_object As Variant
+    Dim ans As Long
+    
+    
+      elart_msg = "廃棄処理を更新しますか？"
+    chk_code = check_form(1) 'ステータスコード： 0:ok, 1:NG, 2:yes/no　4:pdf
+    If chk_code = 1 Then
+        MsgBox (check_form(0))
+        Exit Sub
+    ElseIf chk_code = 2 Then
+        elart_msg = check_form(0)
+    End If
+
+    
+    
+    chk_msg = check_form(0)
+     ans = MsgBox(elart_msg, vbYesNo)
+    If ans = 6 Then
+        If IsNull(ListBox4) Then
+            MsgBox ("リストを選択してください！")
+            Exit Sub
+        End If
+        'textboxのnullcheckは必要
+        row = ListBox4
+        With Worksheets("Data")
+            .Cells(row, 12).Value = "廃棄" '現在ステータス
+            .Cells(row, 27).Value = TextBox25 'ＩＤ等
+            .Cells(row, 28).Value = TextBox26 '返却時　借用者
+        End With
+        MsgBox ("廃棄処理完了しました。")
+        MultiPage1_Change
+    Else
+        MsgBox ("中断しました。")
+    End If
+    
+End Sub
+
+
+Function check_form()
+    Dim msg As String
+    Dim chk As Long
+    msg = "ok"
+    chk = 1
+        'マルチページ毎のチェック
+        
+        If MultiPage1.Value = 0 Then '貸出中
+                If IsNull(ListBox2) Then
+                    msg = "ユーザを選択してください。"
+                ElseIf IsNull(ListBox3) Then
+                    msg = "アイテムを選択してください。"
+                ElseIf TextBox11 = "" Then
+                    msg = "返却日を入力してください。"
+                ElseIf TextBox12 = "" Then
+                    msg = "返却時の借用者を入力してください。"
+                ElseIf TextBox13 = "" Then
+                    msg = "返却時の確認を入力してください。"
+                ElseIf CheckBox1.Value = True Then
+                    msg = "履歴モードがONになっています。貸出中以外の編集の場合がありますが更新しますか？"
+                    chk = 2
+                ElseIf RadioNum = 0 Then '何も選択されていないとき
+                    msg = "変更後ステータスを入力してください。"
+                End If
+
+            
+        ElseIf MultiPage1.Value = 1 Then '新規貸出
+            If IsNull(ListBox2) Then
+                msg = "ユーザを選択してください。"
+            ElseIf TextBox29.Value = "" Then
+                msg = "入力者を入力してください。"
+            ElseIf TextBox8 = "" Then
+                msg = "貸出日を入力してください。"
+            ElseIf TextBox9 = "" Then
+                msg = "借用時の借用者を入力してください。"
+            ElseIf TextBox10 = "" Then
+                msg = "借用時確認を入力してください。"
+            ElseIf RadioNum = 0 Then '何も選択されていないとき
+                msg = "変更後ステータスを入力してください。"
+            End If
+            
+        ElseIf MultiPage1.Value = 2 Then '貸出可能物品
+            If IsNull(ListBox2) Then
+                msg = "ユーザを選択してください。"
+            ElseIf IsNull(ListBox5) Then
+                msg = "アイテムを選択してください。"
+            ElseIf TextBox8 = "" Then
+                msg = "貸出日を入力してください。"
+            ElseIf TextBox9 = "" Then
+                msg = "借用時の借用者を入力してください。"
+            ElseIf TextBox10 = "" Then
+                msg = "借用時確認を入力してください。"
+            ElseIf RadioNum = 0 Then '何も選択されていないとき
+                msg = "変更後ステータスを入力してください。"
+            End If
+        
+        ElseIf MultiPage1.Value = 3 Then '解約・破棄
+            If IsNull(ListBox4) Then
+                msg = "破棄するアイテムを入力してください。"
+            ElseIf TextBox27 = "" Then
+               msg = "承認日を入力してください。"
+            ElseIf TextBox28 = "" Then
+               msg = "承認者を入力してください。"
+            End If
+        End If
+        
+        
+        
+        '変更後ステータス毎のチェック
+        If RadioNum = 1 Then '貸出可能
+        ElseIf RadioNum = 2 Then '貸出中
+            If TextBox8 = "" Then
+                msg = "貸出日を入力してください。"
+            ElseIf TextBox9 = "" Then
+                msg = "借用時の借用者を入力してください。"
+            ElseIf TextBox10 = "" Then
+                msg = "借用時確認を入力してください。"
+            End If
+                
+        ElseIf RadioNum = 3 Then 'ブランク
+        ElseIf RadioNum = 4 Then '金庫保管
+        ElseIf RadioNum = 5 Then '破棄予定
+        ElseIf RadioNum = 6 Then 'その他
+        End If
+        
+        If msg = "ok" Then
+        chk = 0
+        End If
+        
+        check_form = Array(msg, chk)
+        
+        
+End Function
+Private Sub export_pdf()
+    chk_dir (get_user)
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:="./user/" & get_user & "/" & Format(Date, "yyyymmddhh") & "_" & get_user & ".pdf"
+    With CreateObject("Shell.Application")
+        .ShellExecute CurDir & "/user/" & get_user & "/" & Format(Date, "yyyymmddhh") & "_" & get_user & ".pdf"
+    End With
+End Sub
+
+Sub create_template(target_no As Long)
+    Dim get_user As Variant
+    Dim target_sheet As Variant
+    Dim row As Long
+    Dim temp_list(17, 8) As String
+    Dim cnt As Long
+    
+    If IsNull(ListBox2) Then
+    MsgBox ("ユーザを選択してください。")
+    
+    Exit Sub
+    Else
+    
+    get_user = ListBox2
+    target_sheet = Worksheets("Data").Range("B1:B10000")
+    row = 0
+         For cnt = 1 To 10000
+            If get_user = target_sheet(cnt, 1) Then
+                    If Worksheets("Data").Cells(cnt, 12) = "貸出中" Or target_no = cnt Then
+                        If row = 18 Then
+                        MsgBox ("転記できる最大数を超えました。")
+                        End If
+                        temp_list(row, 0) = Worksheets("Data").Cells(cnt, 1) '備品名
+                        temp_list(row, 1) = Worksheets("Data").Cells(cnt, 3) 'ID等
+                        temp_list(row, 2) = Worksheets("Data").Cells(cnt, 13) '備考
+                        If Worksheets("Data").Cells(cnt, 12) = "貸出中" And target_no = cnt Then
+                        Else
+                        temp_list(row, 3) = Worksheets("Data").Cells(cnt, 6) '借用時 開始日
+                        temp_list(row, 4) = Worksheets("Data").Cells(cnt, 7) '借用時 借用者
+                        temp_list(row, 5) = Worksheets("Data").Cells(cnt, 8) '借用時 確認者
+                        If target_no = cnt Then
+                        Else
+                        temp_list(row, 6) = Worksheets("Data").Cells(cnt, 9) '返却時 返却日
+                        temp_list(row, 7) = Worksheets("Data").Cells(cnt, 10) '返却時 借用者
+                        temp_list(row, 8) = Worksheets("Data").Cells(cnt, 11) '返却時 確認者
+                        row = row + 1
+                        
+                        End If
+                        End If
+                    End If
+            End If
+        Next cnt
+        'ここから転記
+        Sheets("template").Activate
+        Worksheets("template").Cells(4, 1).Value = get_user
+        For row = 0 To 16
+             Worksheets("template").Cells(4 + row, 4).Value = temp_list(row, 0)
+             Worksheets("template").Cells(4 + row, 5).Value = temp_list(row, 1)
+             Worksheets("template").Cells(4 + row, 6).Value = temp_list(row, 2)
+             Worksheets("template").Cells(4 + row, 7).Value = temp_list(row, 3)
+             Worksheets("template").Cells(4 + row, 8).Value = temp_list(row, 4)
+             Worksheets("template").Cells(4 + row, 9).Value = temp_list(row, 5)
+             Worksheets("template").Cells(4 + row, 10).Value = temp_list(row, 6)
+             Worksheets("template").Cells(4 + row, 11).Value = temp_list(row, 7)
+             Worksheets("template").Cells(4 + row, 12).Value = temp_list(row, 8)
+        Next row
+        End If
+End Sub
+
+Sub chk_dir(user)
+    Dim SaveDir As String
+    
+    
+    SaveDir = "./user/" & user
+    
+    ' "C:\Data"の下に今日の日付のフォルダがなければ作成する
+    If Dir(SaveDir, vbDirectory) = "" Then
+        MkDir SaveDir
+    End If
+    
+    Application.DisplayAlerts = False
+    Application.DisplayAlerts = True
+End Sub
+
+Private Sub CommandButton3_Click()
+    create_template (0)
+    ans = MsgBox("pdf発行までやりますか？", vbYesNo)
+    If ans = 6 Then
+    export_pdf
+    End If
+End Sub
